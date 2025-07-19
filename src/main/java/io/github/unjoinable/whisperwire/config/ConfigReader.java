@@ -27,6 +27,24 @@ public class ConfigReader {
             "logging.log_to_file", "logging.log_file_path"
     );
 
+    private final Path configPath;
+
+    /**
+     * Default constructor — uses the hardcoded config path.
+     */
+    public ConfigReader() {
+        this.configPath = CONFIG_PATH;
+    }
+
+    /**
+     * Custom constructor for testing or custom config paths.
+     *
+     * @param configPath The path to the config file.
+     */
+    public ConfigReader(Path configPath) {
+        this.configPath = configPath;
+    }
+
     /**
      * Reads, parses, and validates the TOML configuration file.
      *
@@ -35,9 +53,9 @@ public class ConfigReader {
      *                               or is missing required keys.
      */
     @SuppressWarnings("DataFlowIssue") // Already validated the keys.
-    public RuntimeContext read() {
+    public RuntimeContext load() {
         try {
-            TomlParseResult result = Toml.parse(CONFIG_PATH);
+            TomlParseResult result = Toml.parse(configPath);
 
             if (result.hasErrors()) {
                 String errors = result.errors().stream()
