@@ -1,7 +1,6 @@
 package io.github.unjoinable.whisperwire;
 
 import io.github.unjoinable.whisperwire.config.configs.DiscordConfig;
-import io.github.unjoinable.whisperwire.listeners.UserChatListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
@@ -45,7 +44,6 @@ public class DiscordBot {
                     .createDefault(this.config.token(), GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
                     .build()
                     .awaitReady();
-            this.jda.addEventListener(new UserChatListener(config));
         } catch (InterruptedException | InvalidTokenException e) {
             Thread.currentThread().interrupt(); // Preserve interrupt status
             log.error("Error starting Discord bot", e);
