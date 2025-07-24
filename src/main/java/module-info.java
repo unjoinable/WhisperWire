@@ -2,6 +2,8 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 module WhisperWire.main {
+    exports io.github.unjoinable.whisperwire.core.message;
+    exports io.github.unjoinable.whisperwire.core.node;
     requires org.tomlj;
     requires org.jspecify;
     requires net.dv8tion.jda;
