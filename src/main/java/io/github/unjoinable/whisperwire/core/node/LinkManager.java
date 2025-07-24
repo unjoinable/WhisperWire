@@ -4,6 +4,7 @@ import io.github.unjoinable.whisperwire.core.message.Message;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -62,18 +63,24 @@ public class LinkManager {
     /**
      * Broadcasts a message from the given source to all linked nodes.
      *
+     * <p>Returns a {@link CompletableFuture} that completes when all send operations
+     * to linked nodes have completed.
+     *
      * @param source  the node sending the message
      * @param message the message to relay
+     * @return a {@link CompletableFuture} representing the completion of all relayed messages
      * @throws NullPointerException if either argument is {@code null}
      */
-    public void relay(DuplexNode source, Message message) {
+    public CompletableFuture<Void> relay(DuplexNode source, Message message) {
         Objects.requireNonNull(source, "source node must not be null");
         Objects.requireNonNull(message, "message must not be null");
 
-        links.stream()
+        var futures = links.stream()
                 .filter(link -> link.contains(source))
-                .map(link -> link.oppositeOf(source))
-                .forEach(target -> target.sendMessage(message));
+                .map(link -> link.oppositeOf(source).sendMessage(message))
+                .toArray(CompletableFuture[]::new);
+
+        return CompletableFuture.allOf(futures);
     }
 
     /**

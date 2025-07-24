@@ -1,6 +1,7 @@
 package io.github.unjoinable.whisperwire.core.node;
 
 import io.github.unjoinable.whisperwire.core.message.Message;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class TestDuplexNode extends AbstractDuplexNode {
     }
 
     @Override
-    public CompletableFuture<Void> sendMessage(Message message) {
+    public CompletableFuture<Void> sendMessage(@NotNull Message message) {
         receivedMessages.add(message);
         return CompletableFuture.completedFuture(null);
     }
