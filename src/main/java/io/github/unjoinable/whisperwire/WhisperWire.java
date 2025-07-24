@@ -2,6 +2,8 @@ package io.github.unjoinable.whisperwire;
 
 import io.github.unjoinable.whisperwire.config.ConfigReader;
 import io.github.unjoinable.whisperwire.config.RuntimeContext;
+import io.github.unjoinable.whisperwire.discord.DiscordBot;
+import io.github.unjoinable.whisperwire.discord.BotLoadingContext;
 
 /**
  * Entry point for initializing and starting the WhisperWire Discord bot.
@@ -18,7 +20,8 @@ public final class WhisperWire {
      */
     public WhisperWire() {
         this.context = new ConfigReader().load();
-        this.bot = new DiscordBot(context.discordConfig());
+        var discordConfig = context.discordConfig();
+        this.bot = new DiscordBot(new BotLoadingContext(discordConfig.token(), discordConfig.guildId()));
     }
 
     /**

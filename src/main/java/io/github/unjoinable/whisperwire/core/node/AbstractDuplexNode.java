@@ -3,7 +3,6 @@ package io.github.unjoinable.whisperwire.core.node;
 import io.github.unjoinable.whisperwire.core.message.Message;
 
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Base class for implementations of {@link DuplexNode}, providing common functionality
@@ -37,17 +36,6 @@ public abstract class AbstractDuplexNode implements DuplexNode {
     public String id() {
         return id;
     }
-
-    /**
-     * Sends a message to this node.
-     *
-     * <p>Subclasses must implement this method to handle message processing logic.
-     *
-     * @param message the message to send
-     * @return a {@link CompletableFuture} representing the outcome of the send operation
-     */
-    @Override
-    public abstract CompletableFuture<Void> sendMessage(Message message);
 
     /**
      * Returns a string representation of this node.

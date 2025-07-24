@@ -50,4 +50,16 @@ public class MinestomDuplexNode extends AbstractDuplexNode {
             playerSupplier.get().forEach(player -> player.sendMessage(formatted));
         });
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof MinestomDuplexNode that)) return false;
+        if (!super.equals(o)) return false;
+        return Objects.equals(playerSupplier, that.playerSupplier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), playerSupplier);
+    }
 }

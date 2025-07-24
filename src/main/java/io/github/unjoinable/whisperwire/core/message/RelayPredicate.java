@@ -2,6 +2,8 @@ package io.github.unjoinable.whisperwire.core.message;
 
 import io.github.unjoinable.whisperwire.core.node.DuplexNode;
 
+import java.util.function.Predicate;
+
 /**
  * A functional interface that determines whether a {@link Message} should be relayed.
  *
@@ -13,7 +15,7 @@ import io.github.unjoinable.whisperwire.core.node.DuplexNode;
  * from simple, reusable components.
  */
 @FunctionalInterface
-public interface RelayPredicate {
+public interface RelayPredicate extends Predicate<Message> {
 
     /**
      * A predicate that always allows messages to be relayed.
@@ -67,6 +69,7 @@ public interface RelayPredicate {
      *
      * @return a predicate that returns {@code true} if this predicate returns {@code false}, and vice versa
      */
+    @Override
     default RelayPredicate negate() {
         return message -> !this.test(message);
     }
