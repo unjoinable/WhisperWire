@@ -18,33 +18,45 @@ class ConfigReaderTest {
     @TempDir Path tempDir;
 
     @Test
-    void testLoad_Success() throws IOException {
+    void testLoad_ConfigBehavior() throws IOException {
         Path configFile = tempDir.resolve("config.toml");
-        String content = """
-            # Discord Bot Settings
-            [discord]
-            token = "abc123"
-            guild_id = "guild1"
 
-            # Minecraft Bridge Settings
-            [minecraft]
-            enable_chat_bridge = true
-            chat_format = "<{username}> {message}"
-            discord_to_mc_format = "[D] {username}: {message}"
-            show_join_leave = true
-
-            # Webhook Settings (Optional)
-            [webhook.formatting]
-            username_format = "{username}"
-            avatar_url = "https://example.com/{uuid}"
-
-            # Logging Settings
-            [logging]
-            log_to_file = true
-            log_file_path = "logs/test.log"
-            """;
-        Files.writeString(configFile, content);
+        // First test: Empty config should throw IllegalStateException
+        Files.writeString(configFile, "");
         ConfigReader configReader = new ConfigReader(configFile);
+
+        assertThrows(IllegalStateException.class, configReader::load, "Expected load() to throw due to missing required config");
+
+        // Second test: Valid config should load correctly
+        String content = """
+        # Discord Bot Settings
+        [discord]
+        token = "abc123"
+        guild_id = "guild1"
+        
+        # Discord Channels ID
+        [discord.channels_id]
+        chat = "234567890123456789"
+
+        # Minecraft Bridge Settings
+        [minecraft]
+        enable_chat_bridge = true
+        chat_format = "<{username}> {message}"
+        discord_to_mc_format = "[D] {username}: {message}"
+        show_join_leave = true
+
+        # Webhook Settings (Optional)
+        [webhook.formatting]
+        username_format = "{username}"
+        avatar_url = "https://example.com/{uuid}"
+
+        # Logging Settings
+        [logging]
+        log_to_file = true
+        log_file_path = "logs/test.log"
+        """;
+        Files.writeString(configFile, content);
+        configReader = new ConfigReader(configFile); // re-initialize
         RuntimeContext context = configReader.load();
 
         assertNotNull(context);
