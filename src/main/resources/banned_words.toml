@@ -1,0 +1,6 @@
+banned_words = [
+    "damn",
+    "hell",
+    "shit",
+    "minestorm"
+]

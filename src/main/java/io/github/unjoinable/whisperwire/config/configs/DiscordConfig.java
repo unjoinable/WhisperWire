@@ -1,18 +1,22 @@
 package io.github.unjoinable.whisperwire.config.configs;
 
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * Configuration for Discord integration.
  *
  * @param token Discord bot token.
  * @param guildId Discord guild/server ID.
- * @param chatChannelId ID of the chat channel.
- * @param eventsChannelId ID of the events channel.
+ * @param channels Map of channel names to their IDs.
  */
 public record DiscordConfig(
         String token,
         String guildId,
-        String chatChannelId,
-        String eventsChannelId) {
+        Map<String, String> channels) {
 
     /**
      * Creates a new builder for {@link DiscordConfig}.
@@ -25,10 +29,9 @@ public record DiscordConfig(
      * Builder for {@link DiscordConfig}.
      */
     public static class Builder {
-        private String token;
-        private String guildId;
-        private String chatChannelId;
-        private String eventsChannelId;
+        private @Nullable String token;
+        private @Nullable String guildId;
+        private final Map<String, String> channels = new HashMap<>();
 
         public Builder token(String token) {
             this.token = token;
@@ -40,18 +43,16 @@ public record DiscordConfig(
             return this;
         }
 
-        public Builder chatChannelId(String chatChannelId) {
-            this.chatChannelId = chatChannelId;
-            return this;
-        }
-
-        public Builder eventsChannelId(String eventsChannelId) {
-            this.eventsChannelId = eventsChannelId;
+        public Builder channel(String name, String id) {
+            this.channels.put(name, id);
             return this;
         }
 
         public DiscordConfig build() {
-            return new DiscordConfig(token, guildId, chatChannelId, eventsChannelId);
+            Objects.requireNonNull(token, "Discord bot token must not be null");
+            Objects.requireNonNull(guildId, "Discord guild ID must not be null");
+
+            return new DiscordConfig(token, guildId, Map.copyOf(channels));
         }
     }
 }

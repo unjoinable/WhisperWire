@@ -1,23 +1,25 @@
 # Discord Bot Settings
 [discord]
-token = "YOUR_DISCORD_BOT_TOKEN"                         # Your bot's token from the Discord Developer Portal
-guild_id = "123456789012345678"                          # The Discord server (guild) ID where the bot operates
-chat_channel_id = "234567890123456789"                   # The text channel ID where Minecraft chat messages will be sent
-events_channel_id = "345678901234567890"                 # (Optional) Channel ID for player join/leave event messages
+token = "YOUR_DISCORD_BOT_TOKEN"
+guild_id = "123456789012345678"
+
+# Discord Channels ID
+[discord.channels_id]
+chat = "234567890123456789"
 
 # Minecraft Bridge Settings
 [minecraft]
-enable_chat_bridge = true                                # Enables or disables the bridge from Minecraft to Discord
-chat_format = "<{username}> {message}"                   # Format for Minecraft player chat sent to Discord
-discord_to_mc_format = "[Discord] {username}: {message}" # Format for Discord messages sent into the Minecraft chat
-show_join_leave = true                                   # Whether to announce player join/leave events in Discord
+enable_chat_bridge = true
+chat_format = "<{username}> {message}"
+discord_to_mc_format = "[Discord] {username}: {message}"
+show_join_leave = true
 
-# Webhook Settings (Optional)
+# Webhook Settings
 [webhook.formatting]
-username_format = "{username}"                           # Format for displaying usernames via webhook
-avatar_url = "https://mc-heads.net/avatar/{uuid}/64"     # URL for the user's avatar image
+username_format = "{username}"
+avatar_url = "https://mc-heads.net/avatar/{uuid}/64"
 
 # Logging Settings
 [logging]
-log_to_file = true                                       # Whether to write logs to a file
-log_file_path = "logs/bridge.log"                        # Path where the log file will be saved
+log_to_file = true
+log_file_path = "logs/bridge.log"
