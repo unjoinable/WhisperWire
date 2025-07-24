@@ -1,24 +1,30 @@
 package io.github.unjoinable.whisperwire.core.node;
 
 import io.github.unjoinable.whisperwire.core.message.Message;
+import io.github.unjoinable.whisperwire.core.message.RelayPredicate;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Establishes a bidirectional message link between two {@link DuplexNode} instances.
+ * Establishes a bidirectional message link between two {@link DuplexNode} instances,
+ * with optional message filtering via a {@link RelayPredicate}.
  *
- * <p>This class forwards messages sent to one node to the other, effectively acting
- * as a bridge between the two endpoints. The connection is symmetric and supports
- * asynchronous message delivery.
+ * <p>This class forwards messages sent to one node to the other, optionally applying
+ * a filter to determine whether the message should be relayed.
  *
- * @param nodeA the first {@link DuplexNode}
- * @param nodeB the second {@link DuplexNode}
+ * @param nodeA     the first {@link DuplexNode}
+ * @param nodeB     the second {@link DuplexNode}
+ * @param predicate the {@link RelayPredicate} used to determine whether messages
+ *                  should be relayed across this link
  */
-public record DuplexLink(DuplexNode nodeA, DuplexNode nodeB) {
+public record DuplexLink(
+        DuplexNode nodeA,
+        DuplexNode nodeB,
+        RelayPredicate predicate) {
 
     /**
-     * Constructs a {@code DuplexLink} between two nodes.
+     * Constructs a {@code DuplexLink} between two nodes with a default allow-all filter.
      *
      * @throws IllegalArgumentException if both nodes have the same ID
      * @throws NullPointerException if either node is {@code null}
@@ -26,6 +32,7 @@ public record DuplexLink(DuplexNode nodeA, DuplexNode nodeB) {
     public DuplexLink {
         Objects.requireNonNull(nodeA, "nodeA must not be null");
         Objects.requireNonNull(nodeB, "nodeB must not be null");
+        Objects.requireNonNull(predicate, "predicate must not be null");
 
         if (Objects.equals(nodeA.id(), nodeB.id())) {
             throw new IllegalArgumentException("Cannot link nodes with identical IDs: " + nodeA.id());
@@ -33,28 +40,33 @@ public record DuplexLink(DuplexNode nodeA, DuplexNode nodeB) {
     }
 
     /**
-     * Forwards a {@link Message} from the origin node to the opposite endpoint.
-     *
-     * <p>This method determines the direction based on the origin node's ID.
+     * Constructs a {@code DuplexLink} with default allow-all predicate.
+     */
+    public DuplexLink(DuplexNode nodeA, DuplexNode nodeB) {
+        this(nodeA, nodeB, RelayPredicate.ALLOW_ALL);
+    }
+
+    /**
+     * Forwards a {@link Message} from the origin node to the opposite endpoint,
+     * if allowed by the {@link RelayPredicate}.
      *
      * @param fromNode the origin {@link DuplexNode}
      * @param message  the {@link Message} to forward
-     * @return a {@link CompletableFuture} representing the completion of the send operation
+     * @return a {@link CompletableFuture} representing the send operation; completes immediately if blocked
      * @throws IllegalArgumentException if {@code fromNode} is not part of this link
      */
     public CompletableFuture<Void> forward(DuplexNode fromNode, Message message) {
-        return switch (fromNode.id()) {
-            case String idA when idA.equals(nodeA.id()) -> nodeB.sendMessage(message);
-            case String idB when idB.equals(nodeB.id()) -> nodeA.sendMessage(message);
-            default -> throw new IllegalArgumentException("Unknown node: " + fromNode.id());
-        };
+        DuplexNode target = oppositeOf(fromNode);
+
+        if (!predicate.test(message)) {
+            return CompletableFuture.completedFuture(null); // Blocked by predicate
+        }
+
+        return target.sendMessage(message);
     }
 
     /**
      * Checks whether the given node is part of this link.
-     *
-     * @param node the {@link DuplexNode} to check
-     * @return {@code true} if the node is linked, {@code false} otherwise
      */
     public boolean contains(DuplexNode node) {
         return node.id().equals(nodeA.id()) || node.id().equals(nodeB.id());
@@ -62,10 +74,6 @@ public record DuplexLink(DuplexNode nodeA, DuplexNode nodeB) {
 
     /**
      * Returns the opposite node in the link.
-     *
-     * @param node the node whose counterpart is to be found
-     * @return the opposite {@link DuplexNode}
-     * @throws IllegalArgumentException if the given node is not part of this link
      */
     public DuplexNode oppositeOf(DuplexNode node) {
         return switch (node.id()) {
@@ -77,10 +85,6 @@ public record DuplexLink(DuplexNode nodeA, DuplexNode nodeB) {
 
     /**
      * Checks whether this link connects the two given nodes, regardless of order.
-     *
-     * @param a one endpoint node
-     * @param b the other endpoint node
-     * @return {@code true} if both nodes are endpoints of this link
      */
     public boolean connects(DuplexNode a, DuplexNode b) {
         String id1 = a.id();
