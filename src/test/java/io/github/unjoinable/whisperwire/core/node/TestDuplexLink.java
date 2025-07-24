@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DuplexLinkTest {
+class TestDuplexLink {
 
     private TestDuplexNode nodeA;
     private TestDuplexNode nodeB;
