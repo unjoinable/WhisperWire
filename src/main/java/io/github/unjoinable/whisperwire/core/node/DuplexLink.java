@@ -74,4 +74,18 @@ public record DuplexLink(DuplexNode nodeA, DuplexNode nodeB) {
             default -> throw new IllegalArgumentException("Node is not part of this link: " + node.id());
         };
     }
+
+    /**
+     * Checks whether this link connects the two given nodes, regardless of order.
+     *
+     * @param a one endpoint node
+     * @param b the other endpoint node
+     * @return {@code true} if both nodes are endpoints of this link
+     */
+    public boolean connects(DuplexNode a, DuplexNode b) {
+        String id1 = a.id();
+        String id2 = b.id();
+        return (nodeA.id().equals(id1) && nodeB.id().equals(id2)) ||
+                (nodeA.id().equals(id2) && nodeB.id().equals(id1));
+    }
 }
