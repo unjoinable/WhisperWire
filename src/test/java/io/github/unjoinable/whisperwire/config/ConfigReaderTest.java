@@ -25,8 +25,6 @@ class ConfigReaderTest {
             [discord]
             token = "abc123"
             guild_id = "guild1"
-            chat_channel_id = "chan1"
-            events_channel_id = "chan2"
 
             # Minecraft Bridge Settings
             [minecraft]
@@ -56,8 +54,6 @@ class ConfigReaderTest {
         assertNotNull(discord);
         assertEquals("abc123", discord.token());
         assertEquals("guild1", discord.guildId());
-        assertEquals("chan1", discord.chatChannelId());
-        assertEquals("chan2", discord.eventsChannelId());
 
         // Minecraft Config
         MinecraftConfig mc = context.minecraftConfig();
